@@ -2,7 +2,7 @@
 Open Source Initiative OSI - The MIT License (MIT):Licensing
 
 The MIT License (MIT)
-Copyright (c) 2013 Ralph Caraveo (deckarep@gmail.com)
+Copyright (c) 2013 - 2022 Ralph Caraveo (deckarep@gmail.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -27,13 +27,13 @@ package mapset
 
 // Iterator defines an iterator over a Set, its C channel can be used to range over the Set's
 // elements.
-type Iterator struct {
-	C    <-chan interface{}
+type Iterator[T comparable] struct {
+	C    <-chan T
 	stop chan struct{}
 }
 
 // Stop stops the Iterator, no further elements will be received on C, C will be closed.
-func (i *Iterator) Stop() {
+func (i *Iterator[T]) Stop() {
 	// Allows for Stop() to be called multiple times
 	// (close() panics when called on already closed channel)
 	defer func() {
@@ -48,10 +48,10 @@ func (i *Iterator) Stop() {
 }
 
 // newIterator returns a new Iterator instance together with its item and stop channels.
-func newIterator() (*Iterator, chan<- interface{}, <-chan struct{}) {
-	itemChan := make(chan interface{})
+func newIterator[T comparable]() (*Iterator[T], chan<- T, <-chan struct{}) {
+	itemChan := make(chan T)
 	stopChan := make(chan struct{})
-	return &Iterator{
+	return &Iterator[T]{
 		C:    itemChan,
 		stop: stopChan,
 	}, itemChan, stopChan

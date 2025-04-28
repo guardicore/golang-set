@@ -1,8 +1,11 @@
+//go:build go1.21
+// +build go1.21
+
 /*
 Open Source Initiative OSI - The MIT License (MIT):Licensing
 
 The MIT License (MIT)
-Copyright (c) 2013 - 2022 Ralph Caraveo (deckarep@gmail.com)
+Copyright (c) 2013 - 2023 Ralph Caraveo (deckarep@gmail.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -26,35 +29,14 @@ SOFTWARE.
 package mapset
 
 import (
-	"testing"
+	"cmp"
+	"slices"
 )
 
-type yourType struct {
-	name string
-}
-
-func Test_ExampleIterator(t *testing.T) {
-
-	s := NewSet(
-		[]*yourType{
-			{name: "Alise"},
-			{name: "Bob"},
-			{name: "John"},
-			{name: "Nick"},
-		}...,
-	)
-
-	var found *yourType
-	it := s.Iterator()
-
-	for elem := range it.C {
-		if elem.name == "John" {
-			found = elem
-			it.Stop()
-		}
-	}
-
-	if found == nil || found.name != "John" {
-		t.Fatalf("expected iterator to have found `John` record but got nil or something else")
-	}
+// Sorted returns a sorted slice of a set of any ordered type in ascending order.
+// When sorting floating-point numbers, NaNs are ordered before other values.
+func Sorted[E cmp.Ordered](set Set[E]) []E {
+	s := set.ToSlice()
+	slices.Sort(s)
+	return s
 }
